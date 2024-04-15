@@ -30,6 +30,7 @@ class Strategy:
 
 
     def OnBar(self):
+        ''' The key function for implementing a strategy. Every new strategy needs to override OnBar().'''
         pass
 
 
@@ -66,6 +67,7 @@ class SMACross(Strategy):
 
 
     def crossover(self, ticker):
+        ''' Computes the difference between the slopes of the secant lines of the fast and slow moving averages.'''
         
         df = pd.DataFrame(index = self.datas[ticker].index)
         df['Adj Close'] = self.datas[ticker]['Adj Close']

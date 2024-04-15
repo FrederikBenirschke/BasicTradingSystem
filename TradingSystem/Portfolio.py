@@ -36,11 +36,13 @@ class Portfolio:
         '''
         return value <= self.cash
 
-    def HasPositions(self, ticker, size):
+    def HasPosition(self, ticker, size):
+        ''' Method returns the among of stocks with the asset ticker in the portfolio.'''
         return size <= self.GetPositionSize(ticker)
 
 
     def AddPosition(self, ticker, size = 1):
+        ''' Adds size assets underlying ticker.'''
         if ticker in [tick for tick  in self.positions.keys()]:
             
             self.positions[ticker]+= size
@@ -49,6 +51,7 @@ class Portfolio:
             self.positions[ticker] = size
 
     def GetPositionSize(self, ticker):
+        ''' Returns the number of assets underlying ticker in the portfolio.'''
         if ticker in self.positions:
             return self.positions[ticker]
         else:

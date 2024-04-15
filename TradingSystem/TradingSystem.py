@@ -38,7 +38,12 @@ class TradingSystem:
 
 
     def Run(self):
-         for idx in tqdm(self.calendar):
+        ''' Performs a backtest of the trading strategy prescribed in self.strategy.
+        The backtest consists of two steps. For each time step:
+        - Handle all orders that were created at the end of the previous day. An order will be filled if there are enough
+        funds to buy or enough stocks to sell.
+        - Run the OnBar() function of self.strategy and create new orders.'''
+        for idx in tqdm(self.calendar):
             self.current_idx = idx
             self.strategy.current_idx = self.current_idx
             # fill orders from previus period
@@ -54,7 +59,6 @@ class TradingSystem:
 
         - We can only buy if the cash balance is sufficient.
         - We can only sell if the we have enough shares in the portfolio.
-        
         '''
         for order in self.strategy.orders:
             canFill = False
@@ -63,18 +67,16 @@ class TradingSystem:
             data = self.datas[order.ticker]
             time = self.current_idx.strftime(self.format)
             
-            # print(data[self.current_idx])
 
             price = data.loc[self.current_idx, 'Open'] 
-            # print(price)
-            # print(self.portfolio)
-            # print(price)
-
+            # For a buy order check if there are sufficients funds in the portfolio to buy assets
             if order.side == 'buy' and self.portfolio.HasCash(price * order.size):
                     canFill = True 
-            elif order.side == 'sell' and self.portfolio.HasPositions(ticker, order.size):
+            # For a sell order check if there are enough assets available to sell
+            elif order.side == 'sell' and self.portfolio.HasPosition(ticker, order.size):
                     canFill = True
            
+            # If the order can be filled create a new trade
             if canFill:
                 t = Trade(
                     order.ticker,
@@ -89,19 +91,17 @@ class TradingSystem:
                 self.strategy.trades.append(t)
                 self.portfolio.AddPosition(order.ticker, t.size)
                 self.portfolio.AddCash( -t.price * t.size)
-                print('Order filled', 'Ticker:', order.ticker, 'Size: ', order.size, 'Price: ', price)
+                # print('Order filled', 'Ticker:', order.ticker, 'Size: ', order.size, 'Price: ', price)
             else:
                 pass
-                print('Order cannot be filled', 'Time: ', self.current_idx)
-            # print('New portfolio:')
-            # print(self.portfolio)
-
+                # print('Order cannot be filled', 'Time: ', self.current_idx)
+            
+        # Clear all orders in the strategy
         self.strategy.orders = []
 
     def AddData(self, ticker, startDate, endDate):
         ''' Collects the financial data of the asset underlying 'ticker' in the date range between 'startDate' and 'endDate'.
         Currently only data from 'yahooFinance' is supported.'''
-
         self.datas[ticker] = yf.download(ticker, start=startDate, end=endDate)
         self.calendar = self.datas[ticker].index
 
@@ -113,7 +113,7 @@ class TradingSystem:
         return self.datas[ticker].loc[self.current_idx,col] 
     
     def SetStrategy(self, strategy):
-
+        ''' Sets the strategy that will be used when executing Run().'''
         self.strategy = strategy
         self.strategy.datas = self.datas
         self.strategy.tickers = list(self.datas.keys())
@@ -121,7 +121,7 @@ class TradingSystem:
 
 
     def GetStats(self):
-        '''Returns metric for analyzing the results of the backtesting. Currently on the total return is implemented.'''
+        '''Returns metrics for analyzing the results of the backtesting. Currently only the total return is implemented.'''
 
         metrics = {}
         # Total return conssits of current value of the portfolio which is the sum of the cash value and the value of the current
@@ -150,25 +150,6 @@ class TradingSystem:
 
 
 
-# ticker = "AAPL"
-# startDate = "2020-01-01"
-# endDate = "2020-01-10"
 
-
-# trader = TradingSystem()
-# trader.AddData(ticker, startDate, endDate)
-
-# trader.SetStrategy(BasicStrategy(trader.portfolio,trader.datas))
-# trader.portfolio.AddCash(10000)
-# # print(trader.portfolio)
-# trader.Run()
-# PlotStockData(trader.datas[ticker])
-# for x in trader.strategy.trades:
-#     print(x)
-# print(data.loc[trader.current_idx, 'Open'])
-# print(type(data.loc[trader.current_idx, 'Open']))
-# print(trader.strategy.tickers)
-# 
-# print(trader.portfolio.cash)
 
 
