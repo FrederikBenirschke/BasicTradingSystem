@@ -29,6 +29,7 @@ class TradingSystem:
         self.calendar = None
         self.current_idx = None
         self.format = '%Y-%m-%d %H:%M:%S'
+        self.log = {}
         
         
 
@@ -51,6 +52,7 @@ class TradingSystem:
             
             # Run the strategy on the current bar
             self.strategy.OnBar()
+            self.Log(self.current_idx)
             # print(idx)
 
 
@@ -104,6 +106,7 @@ class TradingSystem:
         Currently only data from 'yahooFinance' is supported.'''
         self.datas[ticker] = yf.download(ticker, start=startDate, end=endDate)
         self.calendar = self.datas[ticker].index
+       
 
 
     def GetPrice(self, ticker, time, col = 'Open'):
@@ -118,19 +121,41 @@ class TradingSystem:
         self.strategy.datas = self.datas
         self.strategy.tickers = list(self.datas.keys())
         self.strategy.portfolio = self.portfolio
+        # Log is used to track the value over time
+        self.log = pd.DataFrame(index=self.calendar, columns =['Portfolio'])
+
+
+    def Log(self,time):
+        self.log.at[time, 'Portfolio'] = self.GetPortfolioValue()
 
 
     def GetStats(self):
         '''Returns metrics for analyzing the results of the backtesting. Currently only the total return is implemented.'''
 
         metrics = {}
-        # Total return conssits of current value of the portfolio which is the sum of the cash value and the value of the current
+        # Total return consits of current value of the portfolio which is the sum of the cash value and the value of the current
         # assets
         totalReturn = self.portfolio.cash
         for ticker in self.datas:
             totalReturn += self.GetPrice(ticker, self.current_idx, col = 'Close') *self.portfolio.GetPositionSize(ticker)
         totalReturn /= self.portfolio.initialCash
         metrics['Total Return'] = 100*(totalReturn -1)
+
+
+        # Assuming a risk-free rate of 1%
+        r= 0.01
+        # Computes the risk free return on the initial cash value
+        for time in self.calendar:
+            self.log.at[time,'Riskfree'] =self.portfolio.initialCash* np.exp(r* (time- self.calendar[0]).days/365.25)
+
+        metrics['Volatility'] = self.log['Portfolio'].std().mean()/self.log['Portfolio'].mean()
+        metrics['Average Return'] = ((self.log['Portfolio'] - self.portfolio.initialCash)/self.portfolio.initialCash).mean()
+        
+        time = (self.calendar[-1]- self.calendar[0]).days/365.25
+        metrics['Riskfree Return'] = self.portfolio.initialCash* np.exp(r* time)
+        metrics['Riskfree Return']  = (metrics['Riskfree Return']  - self.portfolio.initialCash)/self.portfolio.initialCash
+        # Sharpe ratio is (Excess return - risk free return)/ Volatility
+        metrics['Sharpe'] = (metrics['Average Return'] -metrics['Riskfree Return'])/metrics['Volatility']
         return metrics
 
     def GetPortfolioValue(self):

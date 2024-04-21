@@ -6,6 +6,10 @@ class Portfolio:
         self.positions = {}
         self.cash = 0
         self.initialCash = 0
+        
+
+
+    
          
     def SetInitialCash(self, cash):
         ''' Method to set the initial cash value of portfolio. Used to analyze the returns of the portfolio over time.

@@ -15,6 +15,7 @@ class Strategy:
         self.tickers = []
         
         
+        
 
 
     def Buy(self,ticker, size = 1):
