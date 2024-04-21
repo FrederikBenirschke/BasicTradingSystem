@@ -47,15 +47,17 @@ class Strategy:
 class BasicStrategy(Strategy):
     '''Nonsensical startegy for testing purposes only. Buys on one day and sells on the next.'''
 
-    def OnBar(self):
+    def OnBar(self, verbose = False):
         ticker = self.tickers[0]
         
         if self.positionSize(ticker) == 0:
             self.Buy(ticker, size = 1)
-            print(self.current_idx,"buy order created")
+            if verbose:
+                print(self.current_idx,"buy order created")
         else:
             self.Sell(ticker, size = 1)
-            print(self.current_idx,"sell order created")
+            if verbose:
+                print(self.current_idx,"sell order created")
 
 
 
@@ -83,7 +85,7 @@ class SMACross(Strategy):
 
 
 
-    def OnBar(self):
+    def OnBar(self, verbose = False):
         thresh = 0.2
         ticker = self.tickers[0]
         
@@ -93,14 +95,16 @@ class SMACross(Strategy):
             if self.crossover(ticker)>thresh: 
             
                 self.Buy(ticker, size = 1)
-                print(self.current_idx,"buy order created")
+                if verbose:
+                    print(self.current_idx,"buy order created")
          #If we do  own a position and the fast average crosses
         # downwards  through the slow average, generate a sell signal   
         else:
             if self.crossover(ticker)<-thresh: 
 
                 self.Sell(ticker, size = 1)
-                print(self.current_idx,"sell order created")
+                if verbose:
+                    print(self.current_idx,"sell order created")
 
 
         

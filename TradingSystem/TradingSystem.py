@@ -110,7 +110,7 @@ class TradingSystem:
 
 
     def GetPrice(self, ticker, time, col = 'Open'):
-        '''Returns the price of teh asset underlying 'ticker' at the time 'time'. 
+        '''Returns the price of the asset underlying 'ticker' at the time 'time'. 
         'col' determines which value is used. The standard values from YahooFinance are
         'Open, Close, Adj Close, High, Low, Volume.'''
         return self.datas[ticker].loc[self.current_idx,col] 
