@@ -28,9 +28,7 @@ After we have selected promising pairs, [in this notebook](TradingSystem/Trading
 that generates buy and sell signals based on the z-score of the spread. We use a z-Score > 1 as an indicator that the first asset is overvalued and a z-Score < -1 as an indicator that the second asset is overvalued.
 Here is a plot of a simple strategy trading Binance and CitiGroup from 2021 to 2023.
 
-![Unknown-3](https://github.com/FrederikBenirschke/BasicTradingSystem/assets/133478072/5696e5b4-4403-47b4-9563-68989c586247)
-
-
+![Unknown-4](https://github.com/FrederikBenirschke/BasicTradingSystem/assets/133478072/413490e9-dadc-4745-8255-da8387025cf5)
 
 
 
