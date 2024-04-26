@@ -1,5 +1,6 @@
 from Order import *
 import pandas as pd
+import math
 
 class Strategy:
     '''A strategy is performed once a day by calling OnBar() in TradingSystem.run() and can create buy and sell orders.
@@ -58,6 +59,21 @@ class BasicStrategy(Strategy):
             self.Sell(ticker, size = 1)
             if verbose:
                 print(self.current_idx,"sell order created")
+
+
+class BuyAndHold(Strategy):
+    ''' Buy maximum amount of an asset on day 1 and hold until the end.'''
+
+    def OnBar(self, verbose = False):
+        ticker = self.tickers[0]
+        
+        if self.positionSize(ticker) == 0:
+            prize = self.datas[ticker].loc[self.current_idx,'Close']
+            self.Buy(ticker, size = math.floor(self.portfolio.cash/prize))
+            if verbose:
+                print(self.current_idx,"buy order created")
+       
+
 
 
 
