@@ -56,7 +56,7 @@ class TradingSystem:
 			# print(idx)
 
 
-	def FillOrders(self, verbose = True):
+	def FillOrders(self):
 		'''This method  handles all current orders. If an order can be fulfilled it creates a new Trade object and adjusts the cash value
 
 		- We can only buy if the cash balance is sufficient.
@@ -103,7 +103,15 @@ class TradingSystem:
 
 	def AddData(self, ticker, startDate, endDate):
 		''' Collects the financial data of the asset underlying 'ticker' in the date range between 'startDate' and 'endDate'.
-		Currently only data from 'yahooFinance' is supported.'''
+		Currently only data from 'yahooFinance' is supported.
+		Parameters
+		----------
+		ticker :'string'
+			The name of the financial asset
+		
+		startDate/endDate: 'string' in Date format
+			Downloads the financial data for 'ticker' between startDate and endDate
+		'''
 		self.datas[ticker] = yf.download(ticker, start=startDate, end=endDate)
 		self.calendar = self.datas[ticker].index
 
