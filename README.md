@@ -32,6 +32,9 @@ Here is a plot of a simple strategy trading Binance and CitiGroup from 2021 to 2
 
 
 
+# Prerequisites 
+The prerequisites are found in the [YML file](basic_trading_sytem.conda.yml).
+
 
 
 

@@ -16,3 +16,5 @@ class Trade():
 
     # def position(self):
     #     return Position(self.ticker, self.size)
+if __name__ == "__main__":
+    pass

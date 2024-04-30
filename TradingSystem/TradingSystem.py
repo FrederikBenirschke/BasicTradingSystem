@@ -1,6 +1,6 @@
 import yfinance as yf
 import pandas as pd
-import pandas_ta as ta
+# import pandas_ta as ta
 import numpy as np
 from datetime import datetime as dt
 import matplotlib.pyplot as plt
@@ -177,6 +177,10 @@ class TradingSystem:
 		for ticker in self.datas:
 			totalValue += self.GetPrice(ticker, self.current_idx, col = 'Close') *self.portfolio.GetPositionSize(ticker)
 		return totalValue
+
+if __name__ == "__main__":
+	pass
+
 
 
 
