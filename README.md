@@ -1,4 +1,4 @@
-# BasicTradingSystem
+# TradingSystem: A backtester for trading pairs strategies
 
 Provides basic functionality for backtesting algorithmic trading strategies.
 Currently, the following features are supported:
@@ -18,9 +18,11 @@ In [this notebook ](TradingSystem/PairsSelection.ipynb) we implement the followi
 - For each possible pair in a cluster we use the Earle-Grenger test for cointegration and only accept pairs with a resulting p-Value less than $0.03$.
 - Once we find a suitably cointegrated pair, the next step is to establish that the time series is mean-reverting. Here we use three technical indicators:
 - The Hurst exponent is a measure of the long-term memory of a time series. A value between 0-0.5 indicates that the time series will switch between very large and very small values and frequently cross the mean.
-- The half-life time measures how fast a time series reverts back to half its initial deviation from the mean. Assuming an AR(1) model for the spread we can estimate the half-life time as \begin{equation} -\dfrac{\ln(2)}{\ln(\beta)} \end{equation} where $\beta$ is obtained by linear regression of $Y_t$ against $Y_{t-1}$.
+- The half-life time measures how fast a time series reverts back to half its initial deviation from the mean. Assuming an AR(1) model for the spread we can estimate the half-life time as 
+$$ -\dfrac{\ln(2)}{\ln(\beta)}$$
+where $\beta$ is obtained by linear regression of $Y_t$ against $Y_{t-1}$.
 - Lastly, we count the number of times the spread crosses its mean.
-For example, our analysis found that the time series for 'KEY' and 'FITB' show strong mean-reversion between Jan 2021 and October 2023.
+For example, our analysis found that the time series for 'KEY'(KeyCorp) and 'FITB'(Fifth Third Bank) show strong mean-reversion between Jan 2021 and October 2023.
 ![Unknown-2](https://github.com/FrederikBenirschke/BasicTradingSystem/assets/133478072/191ac842-819a-4552-9c4a-a99931ae9670)
 
 
