@@ -14,7 +14,6 @@ class Trade():
         return f'<Trade: {self.idx} {self.ticker} {self.size}@{self.price}>'
 
 
-    # def position(self):
-    #     return Position(self.ticker, self.size)
+
 if __name__ == "__main__":
     pass

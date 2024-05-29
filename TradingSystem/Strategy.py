@@ -3,7 +3,9 @@ import pandas as pd
 import math
 
 class Strategy:
-    '''A strategy is performed once a day by calling OnBar() in TradingSystem.run() and can create buy and sell orders.
+    '''A strategy is performed once a day by calling OnBar() in TradingSystem.run() 
+    and can create buy and sell orders. Strategy is a base class and every new strategy
+    should inherit from it.
         To create a strategy, create a new class that inherits from strategy and overwrite OnBar().'''
 
 
@@ -20,24 +22,40 @@ class Strategy:
 
 
     def Buy(self,ticker, size = 1):
+        """Create a buy order for ticker.
+
+        Args:
+            ticker (string): the ticker of the underlying stock
+            size (int, optional): number of stocks that should be bought. Defaults to 1.
+        """
         self.orders.append(
             Order(ticker,  'buy', size, self.current_idx)
         )
        
 
     def Sell(self, ticker, size = 1):
+        """Create a sell order for the asset underlying ticker.
+
+        Args:
+            ticker (string): ticker for the corresponding asset
+            size (int, optional): number of stocks to be sold. Defaults to 1.
+        """
         self.orders.append(
             Order(ticker, 'sell', -size ,self.current_idx)
         )
 
 
     def OnBar(self):
-        ''' The key function for implementing a strategy. Every new strategy needs to override OnBar().'''
+        ''' The key function for implementing a strategy. Every new strategy needs to override OnBar().
+        This is where the strategy is implemented.'''
         pass
 
 
     def positionSize(self, ticker):
-        '''Returns the current amount of stocks existing in the portfolio'''
+        '''Returns the current amount of stocks existing in the portfolio.
+        
+        Args:
+        ticker(string): the name of the stock'''
         return self.portfolio.GetPositionSize(ticker)
 
 
@@ -46,7 +64,7 @@ class Strategy:
 
 
 class BasicStrategy(Strategy):
-    '''Nonsensical startegy for testing purposes only. Buys on one day and sells on the next.'''
+    '''Basic strategy for testing purposes only. Buys on one day and sells on the next.'''
 
     def OnBar(self, verbose = False):
         ticker = self.tickers[0]

@@ -4,7 +4,10 @@ import seaborn as sns; sns.set()
 import yfinance as yf
 
 def PlotStockData(ticker, stockData):
-    ''' Plots a DataFrame representing the financial data of a single ticker.'''
+    ''' Plots a DataFrame representing the financial data of a single ticker.
+    
+    Args:
+    stockData(pd.DataFrame): time series for stock that will be plotted'''
     plt.figure(figsize=(14,5))
 
     # sns.set_style("ticks")
@@ -26,9 +29,17 @@ def PlotStockData(ticker, stockData):
 
 
 
-
 def PlotTickers(tickers, startDate, endDate, normalization = None):
-    ''' Plots the asset prices corresponding to a list of tickers.'''
+    """Plots the asset prices corresponding to a list of tickers.
+
+    Args:
+        tickers (string):name of the asset
+        startDate (str): first day to be plotted
+        endDate (str): last day to be plotted
+        normalization (sklearn.preprocessing.Normalizer, optional): normalizes the data. Defaults to None.
+    """
+   
+   
     # Create placeholder for data
     data = pd.DataFrame(columns=tickers)
     # Fetch the data
@@ -56,7 +67,9 @@ def PlotTickers(tickers, startDate, endDate, normalization = None):
 
 
 def minMaxNormalization(dataFrame):
-    '''Normalizes a dataFrame using MinMaxNormalization.'''
+    '''Normalizes a dataFrame using MinMaxNormalization.
+    Args:
+    dataFrame(pd.DataFrame): data to be normalized'''
     dfMinMax = dataFrame.copy() 
   
     # apply normalization techniques 

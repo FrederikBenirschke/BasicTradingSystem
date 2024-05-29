@@ -57,7 +57,8 @@ class TradingSystem:
 
 
 	def FillOrders(self):
-		'''This method  handles all current orders. If an order can be fulfilled it creates a new Trade object and adjusts the cash value
+		'''This method  handles all current orders. If an order can be fulfilled,
+		 it creates a new Trade object and adjusts the cash value.
 
 		- We can only buy if the cash balance is sufficient.
 		- We can only sell if the we have enough shares in the portfolio.
@@ -123,12 +124,20 @@ class TradingSystem:
 
 	def GetPrice(self, ticker, time, col = 'Open'):
 		'''Returns the price of the asset underlying 'ticker' at the time 'time'. 
-		'col' determines which value is used. The standard values from YahooFinance are
+		Args:
+
+		ticker(str): name of the asset
+		time(TimeStamp): price at the given time 
+		
+		col(Index): determines which column of the data frame is used.
+		 The standard values from YahooFinance are
 		'Open, Close, Adj Close, High, Low, Volume.'''
 		return self.datas[ticker].loc[self.current_idx,col] 
 	
 	def SetStrategy(self, strategy):
-		''' Sets the strategy that will be used when executing Run().'''
+		''' Sets the strategy for the backtest.
+		Args:
+		strategy(Strategy): the strategy to be used.'''
 		self.strategy = strategy
 		self.strategy.datas = self.datas
 		self.strategy.tickers = list(self.datas.keys())
@@ -142,7 +151,13 @@ class TradingSystem:
 
 
 	def GetStats(self):
-		'''Returns metrics for analyzing the results of the backtesting. Currently only the total return is implemented.'''
+		'''Returns metrics for analyzing the results of the backtesting. 
+		Currently the following metrics are provided:
+		-the total return
+		-Average return
+		-volatility
+		-risk-ree return(default risk-free rate is 1%)
+		-Sharpe ratio'''
 
 		metrics = {}
 		# Total return consits of current value of the portfolio which is the sum of the cash value and the value of the current
@@ -160,9 +175,12 @@ class TradingSystem:
 		for time in self.calendar:
 			self.log.at[time,'Riskfree'] =self.portfolio.initialCash* np.exp(r* (time- self.calendar[0]).days/365.25)
 
+
+
 		metrics['Volatility'] = self.log['Portfolio'].std().mean()/self.log['Portfolio'].mean()
 		metrics['Average Return'] = ((self.log['Portfolio'] - self.portfolio.initialCash)/self.portfolio.initialCash).mean()
 		
+		# length of time series in years
 		time = (self.calendar[-1]- self.calendar[0]).days/365.25
 		metrics['Riskfree Return'] = self.portfolio.initialCash* np.exp(r* time)
 		metrics['Riskfree Return']  = (metrics['Riskfree Return']  - self.portfolio.initialCash)/self.portfolio.initialCash

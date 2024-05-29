@@ -12,17 +12,23 @@ class Portfolio:
     
          
     def SetInitialCash(self, cash):
-        ''' Method to set the initial cash value of portfolio. Used to analyze the returns of the portfolio over time.
+        """Sets the initial cash value of portfolio. Used to analyze the returns of the portfolio over time.
         Should only be called once in the beginning.
-        '''
+
+        Args:
+            cash (int): initial amount of cash in the portfolio
+        """
         self.cash += cash
         self.initialCash += cash
 
 
 
     def AddCash(self, cash):
-        ''' Method to change the current portfolio cash value but does not change the initial cash value.
+        ''' Changes the current cash value of the portfolio.
+        Does not change the initial cash value.
         Should be used to adjust the portfolio value while backtesting.
+        Args:
+            cash(int): the new value of the portfolio
         '''
         self.cash += cash
         
@@ -36,17 +42,27 @@ class Portfolio:
 
 
     def HasCash(self, value):
-        '''Method checks if the amount of cash is at least as large as value 
+        '''Checks if there is enough cash in the portfolio.
+
+        Args:
+            value(int): Returns true if the value of the portfolio is at least value
         '''
         return value <= self.cash
 
     def HasPosition(self, ticker, size):
-        ''' Method returns the among of stocks with the asset ticker in the portfolio.'''
+        ''' Returns true if there are more then size stocks of the asset underlying ticket
+        in the portfolio.
+        Args:
+        ticker(string): the ticker of the underlying asset
+        size(int): how many stocks should the portfolio have'''
         return size <= self.GetPositionSize(ticker)
 
 
     def AddPosition(self, ticker, size = 1):
-        ''' Adds size assets underlying ticker.'''
+        ''' Adds size assets underlying ticker.
+        args:
+        ticker(string): ticker of the corresponding stock
+        size(int): how many stocks should be added'''
         if ticker in [tick for tick  in self.positions.keys()]:
             
             self.positions[ticker]+= size
@@ -55,7 +71,8 @@ class Portfolio:
             self.positions[ticker] = size
 
     def GetPositionSize(self, ticker):
-        ''' Returns the number of assets underlying ticker in the portfolio.'''
+        ''' Returns the number of assets underlying ticker in the portfolio.
+        args(string): ticker of the corresponding stock'''
         if ticker in self.positions:
             return self.positions[ticker]
         else:
