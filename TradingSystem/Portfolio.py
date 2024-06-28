@@ -2,6 +2,22 @@ class Portfolio:
 
 
     def __init__(self):
+        """ 
+        Initializes a new instance of the Portfolio class.
+
+        This constructor sets up the initial state of the Portfolio object. It initializes the following attributes:
+        
+        - orders: a list to store the orders made by the portfolio
+        - positions: a dictionary to store the positions held by the portfolio, where the keys are the tickers and the values are the sizes
+        - cash: an integer representing the current cash value of the portfolio
+        - initialCash: an integer representing the initial cash value of the portfolio
+        
+        Parameters:
+            None
+        
+        Returns:
+            None
+        """
         self.orders = []
         self.positions = {}
         self.cash = 0
@@ -24,7 +40,7 @@ class Portfolio:
 
 
     def AddCash(self, cash):
-        ''' Changes the current cash value of the portfolio.
+        '''  Adds cash value of the portfolio.
         Does not change the initial cash value.
         Should be used to adjust the portfolio value while backtesting.
         Args:
@@ -35,6 +51,12 @@ class Portfolio:
 
 
     def __repr__(self):
+        """
+        Returns a string representation of the Portfolio object.
+
+        Returns:
+            str: A string containing the cash value and the ticker and size of each position in the portfolio.
+        """
         s = 'Portfolio: \n' + 'Cash value: ' + str(self.cash) + '\n'
         for ticker in self.positions.keys():
             s+= 'Ticker:' + ticker + ', Size:' + str(self.positions[ticker]) + '\n'

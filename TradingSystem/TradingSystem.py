@@ -23,6 +23,22 @@ class TradingSystem:
    
 
 	def __init__(self):
+		"""
+		Initialize a new instance of the TradingSystem class.
+
+		This method initializes the attributes of the TradingSystem class. 
+		It sets the `strategy` attribute to None, the `datas` attribute to an empty dictionary,
+		the `portfolio` attribute to a new instance of the Portfolio class,
+		the `calendar` attribute to None, the `current_idx` attribute to None,
+		the `format` attribute to '%Y-%m-%d %H:%M:%S',
+		and the `log` attribute to an empty dictionary.
+
+		Parameters:
+		None
+
+		Returns:
+		None
+		"""
 		self.strategy = None
 		self.datas = {}
 		self.portfolio = Portfolio()
@@ -117,7 +133,16 @@ class TradingSystem:
 		self.calendar = self.datas[ticker].index
 
 	def AddCleanData(self, ticker, df):
-		# ''' Adds the financial data of the asset underlying 'ticker', needs to be already collected, cleaned and scaled.'''
+		"""
+		Adds the financial data of the asset underlying 'ticker', needs to be already collected, cleaned and scaled.
+
+		Parameters:
+			ticker (str): The name of the financial asset.
+			df (pandas.DataFrame): The cleaned and scaled financial data.
+
+		Returns:
+			None
+		"""
 		self.datas[ticker] = df
 		
 		self.calendar = df.index
@@ -147,6 +172,15 @@ class TradingSystem:
 
 
 	def Log(self,time):
+		"""
+		Logs the current value of the portfolio at the given time.
+
+		Parameters:
+		- time (datetime): The time at which the portfolio value is logged.
+
+		Returns:
+		- None
+		"""
 		self.log.at[time, 'Portfolio'] = self.GetPortfolioValue()
 
 

@@ -120,6 +120,15 @@ class SMACross(Strategy):
 
 
     def OnBar(self, verbose = False):
+        """
+        Executes a trading strategy based on the crossover of two moving averages.
+
+        Parameters:
+            verbose (bool, optional): If True, prints the order creation messages. Defaults to False.
+
+        Returns:
+            None
+        """
         thresh = 0.2
         ticker = self.tickers[0]
         
