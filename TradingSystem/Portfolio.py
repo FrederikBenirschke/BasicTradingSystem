@@ -22,6 +22,8 @@ class Portfolio:
         self.positions = {}
         self.cash = 0
         self.initialCash = 0
+
+        
         
 
 

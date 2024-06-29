@@ -41,7 +41,7 @@ class Strategy:
             size (int, optional): number of stocks to be sold. Defaults to 1.
         """
         self.orders.append(
-            Order(ticker, 'sell', -size ,self.current_idx)
+            Order(ticker, 'sell', size ,self.current_idx)
         )
 
 
@@ -86,8 +86,8 @@ class BuyAndHold(Strategy):
         ticker = self.tickers[0]
         
         if self.positionSize(ticker) == 0:
-            prize = self.datas[ticker].loc[self.current_idx,'Close']
-            self.Buy(ticker, size = math.floor(self.portfolio.cash/prize))
+            price = self.datas[ticker].loc[self.current_idx,'Adj Close']
+            self.Buy(ticker, size = math.floor(self.portfolio.cash/price))
             if verbose:
                 print(self.current_idx,"buy order created")
        

@@ -46,6 +46,7 @@ class TradingSystem:
 		self.current_idx = None
 		self.format = '%Y-%m-%d %H:%M:%S'
 		self.log = {}
+		self._transactionCost = 0
 		
 		
 
@@ -55,11 +56,22 @@ class TradingSystem:
 
 
 	def Run(self):
-		''' Performs a backtest of the trading strategy prescribed in self.strategy.
+		"""
+		Runs a backtest of the trading strategy prescribed in self.strategy. 
 		The backtest consists of two steps. For each time step:
-		- Handle all orders that were created at the end of the previous day. An order will be filled if there are enough
-		funds to buy or enough stocks to sell.
-		- Run the OnBar() function of self.strategy and create new orders.'''
+		- Handle all orders that were created at the end of the previous day. 
+		(Unlimited borrowing of cash and shortselling is allowed).	
+		- Run the strategy on the current bar.
+		- Log the portfolio value at the end of the day.
+		This function iterates over the calendar and performs the necessary steps for each time step. The progress is displayed using tqdm.
+		
+		Parameters:
+			None
+		
+		Returns:
+			None
+		"""
+		
 		for idx in tqdm(self.calendar):
 			self.current_idx = idx
 			self.strategy.current_idx = self.current_idx
@@ -69,56 +81,72 @@ class TradingSystem:
 			# Run the strategy on the current bar
 			self.strategy.OnBar()
 			self.Log(self.current_idx)
-			# print(idx)
 
 
 	def FillOrders(self):
-		'''This method  handles all current orders. If an order can be fulfilled,
-		 it creates a new Trade object and adjusts the cash value.
+		"""
+		This method handles all current orders.
+		If an order can be fulfilled, it creates a new Trade object 
+		and adjusts the cash value and the portfolio position.
 
-		- We can only buy if the cash balance is sufficient.
-		- We can only sell if the we have enough shares in the portfolio.
-		'''
+		Parameters:
+		None
+
+		Returns:
+		None
+
+		This function iterates over all the orders in the strategy and performs the following actions:
+		- Retrieves the ticker and data for the current order.
+		- Retrieves the current date and time in the desired format.
+		- Retrieves the open price of the ticker at the current date and time.
+		- Creates a new Trade object with the ticker, side, size, price, and current date.
+		- Adds the trade to the strategy's trades list.
+		- If the order is a buy order, it adds the position to the portfolio and subtracts the price multiplied by the size from the cash balance.
+		- If the order is a sell order, it subtracts the position from the portfolio and adds the price multiplied by the size to the cash balance.
+		- Clears all orders in the strategy.
+		"""
+		
 		for order in self.strategy.orders:
-			canFill = False
+			
 		
 			ticker = order.ticker
 			data = self.datas[order.ticker]
 			time = self.current_idx.strftime(self.format)
 			
 
-			price = data.loc[self.current_idx, 'Open'] 
-			# For a buy order check if there are sufficients funds in the portfolio to buy assets
-			if order.side == 'buy' and self.portfolio.HasCash(price * order.size):
-					canFill = True 
-			# For a sell order check if there are enough assets available to sell
-			elif order.side == 'sell' and self.portfolio.HasPosition(ticker, order.size):
-					canFill = True
-		   
-			# If the order can be filled create a new trade
-			if canFill:
-				t = Trade(
-					order.ticker,
-					order.side,
-					order.size,
-					price,
-					self.current_idx)
+			# We always use adjusted close price
+			price = data.loc[self.current_idx, 'Adj Close'] 
+			
+			# We allow unlimited borrowing of money and short selling
+			# Thus no need to check if sufficient fund or if stock is available
 			
 
-				# The strategy keeps track of all the past trades, so that they can be analyzed later
-				# Then add the corresponding position to the portfolio
-				self.strategy.trades.append(t)
+			# Create a new trade
+			t = Trade(
+				order.ticker,
+				order.side,
+				order.size,
+				price,
+				self.current_idx)
+		
+
+			# The strategy keeps track of all the past trades, so that they can be analyzed later
+			# Then add the corresponding position to the portfolio
+			# Transaction are applied to every trade
+			self.strategy.trades.append(t)
+			
+			if order.side == 'buy':
+
 				self.portfolio.AddPosition(order.ticker, t.size)
-				self.portfolio.AddCash( -t.price * t.size)
-				# print('Order filled', 'Ticker:', order.ticker, 'Size: ', order.size, 'Price: ', price)
-			else:
-				pass
-				# print('Order cannot be filled', 'Time: ', self.current_idx)
+				self.portfolio.AddCash(-t.price * t.size - abs(t.price * t.size) *self._transactionCost)
+			elif order.side == 'sell':
+				self.portfolio.AddPosition(order.ticker, -t.size)
+				self.portfolio.AddCash(t.price * t.size - abs(t.price * t.size) *self._transactionCost)
 			
 		# Clear all orders in the strategy
 		self.strategy.orders = []
 
-	def AddData(self, ticker, startDate, endDate):
+	def DownloadData(self, ticker, startDate, endDate):
 		''' Collects the financial data of the asset underlying 'ticker' in the date range between 'startDate' and 'endDate'.
 		Currently only data from 'yahooFinance' is supported.
 		Parameters
@@ -131,6 +159,7 @@ class TradingSystem:
 		'''
 		self.datas[ticker] = yf.download(ticker, start=startDate, end=endDate)
 		self.calendar = self.datas[ticker].index
+
 
 	def AddCleanData(self, ticker, df):
 		"""
@@ -147,7 +176,9 @@ class TradingSystem:
 		
 		self.calendar = df.index
 
-	def GetPrice(self, ticker, time, col = 'Open'):
+	
+
+	def GetPrice(self, ticker, time, col = 'Adj Close'):
 		'''Returns the price of the asset underlying 'ticker' at the time 'time'. 
 		Args:
 
@@ -173,53 +204,89 @@ class TradingSystem:
 
 	def Log(self,time):
 		"""
-		Logs the current value of the portfolio at the given time.
-
-		Parameters:
-		- time (datetime): The time at which the portfolio value is logged.
-
+		Logs the portfolio value at a specific time.
+		
+		Args:
+			time (TimeStamp): The specific time to log the portfolio value.
+		
 		Returns:
-		- None
+			None
 		"""
+		
 		self.log.at[time, 'Portfolio'] = self.GetPortfolioValue()
+		
 
 
 	def GetStats(self):
-		'''Returns metrics for analyzing the results of the backtesting. 
+		"""
+		Returns metrics for analyzing the results of the backtesting. 
 		Currently the following metrics are provided:
-		-the total return
-		-Average return
-		-volatility
-		-risk-ree return(default risk-free rate is 1%)
-		-Sharpe ratio'''
+		- ROI (Return on Investment)
+		- Annualized Volatility
+		- Max Drawdown
+		- Annualized Sharpe Ratio
+
+		Parameters:
+		None
+
+		Returns:
+		- metrics (dict): A dictionary containing the calculated metrics.
+		"""
+		
 
 		metrics = {}
-		# Total return consits of current value of the portfolio which is the sum of the cash value and the value of the current
+		helperMetrics = {}
+		# Total return consisits of current value of the portfolio which is the sum of the cash value and the value of the current
 		# assets
 		totalReturn = self.portfolio.cash
 		for ticker in self.datas:
-			totalReturn += self.GetPrice(ticker, self.current_idx, col = 'Close') * self.portfolio.GetPositionSize(ticker)
+			totalReturn += self.GetPrice(ticker, self.current_idx, col = 'Adj Close') * self.portfolio.GetPositionSize(ticker)
 		totalReturn /= self.portfolio.initialCash
-		metrics['Total Return'] = 100*(totalReturn -1)
+		metrics['ROI'] = 100*(totalReturn -1)
 
+
+
+		# Daily returns
+		daily_returns = self.log['Portfolio'].pct_change().dropna()
+		mean_daily_return = daily_returns.mean()
+		std_daily_return = daily_returns.std()
+
+
+		# Volatility 
+		
+
+		# Annualize the volatility
+		metrics['Annualized Volatility'] = std_daily_return * np.sqrt(252)
+
+
+
+		# Calculate the cumulative returns
+		cumulative_returns = (1 + daily_returns).cumprod()
+
+		# Calculate the running maximum
+		running_max = cumulative_returns.cummax()
+
+		# Calculate the drawdowns
+		drawdowns = (cumulative_returns - running_max) / running_max
+
+		# Maximum Drawdown
+		metrics['Max Drawdown'] = drawdowns.min()
 
 		# Assuming a risk-free rate of 1%
-		r= 0.01
+		r= 0.03
 		# Computes the risk free return on the initial cash value
 		for time in self.calendar:
 			self.log.at[time,'Riskfree'] =self.portfolio.initialCash* np.exp(r* (time- self.calendar[0]).days/365.25)
 
 
 
-		metrics['Volatility'] = self.log['Portfolio'].std().mean()/self.log['Portfolio'].mean()
-		metrics['Average Return'] = ((self.log['Portfolio'] - self.portfolio.initialCash)/self.portfolio.initialCash).mean()
+		# Sharpe ratio
 		
-		# length of time series in years
-		time = (self.calendar[-1]- self.calendar[0]).days/365.25
-		metrics['Riskfree Return'] = self.portfolio.initialCash* np.exp(r* time)
-		metrics['Riskfree Return']  = (metrics['Riskfree Return']  - self.portfolio.initialCash)/self.portfolio.initialCash
-		# Sharpe ratio is (Excess return - risk free return)/ Volatility
-		metrics['Sharpe'] = (metrics['Average Return'] -metrics['Riskfree Return'])/metrics['Volatility']
+		sharpe =  mean_daily_return / std_daily_return
+		metrics['Annualized Sharpe'] = sharpe * np.sqrt(252)
+		
+		for(key, value) in metrics.items():
+			print(key, value)
 		return metrics
 
 	def GetPortfolioValue(self):
@@ -227,9 +294,27 @@ class TradingSystem:
 		portfolio.'''
 		totalValue = self.portfolio.cash
 		for ticker in self.datas:
-			totalValue += self.GetPrice(ticker, self.current_idx, col = 'Close') *self.portfolio.GetPositionSize(ticker)
+			totalValue += self.GetPrice(ticker, self.current_idx, col = 'Adj Close') *self.portfolio.GetPositionSize(ticker)
 		return totalValue
 
+
+	def SetTransactionCost(self, cost):
+		"""
+		Set the transaction cost for trading.
+
+		Parameters
+		----------
+		cost : float
+		    The transaction cost to be set. Should be between 0 and 1.
+
+		Returns
+		-------
+		None
+		"""
+		self._transactionCost = cost
+
+
+		
 if __name__ == "__main__":
 	pass
 
