@@ -51,7 +51,7 @@ class Strategy:
         pass
 
 
-    def positionSize(self, ticker):
+    def GetPositionSize(self, ticker):
         '''Returns the current amount of stocks existing in the portfolio.
         
         Args:
@@ -69,7 +69,7 @@ class BasicStrategy(Strategy):
     def OnBar(self, verbose = False):
         ticker = self.tickers[0]
         
-        if self.positionSize(ticker) == 0:
+        if self.GetPositionSize(ticker) == 0:
             self.Buy(ticker, size = 1)
             if verbose:
                 print(self.current_idx,"buy order created")
@@ -85,7 +85,7 @@ class BuyAndHold(Strategy):
     def OnBar(self, verbose = False):
         ticker = self.tickers[0]
         
-        if self.positionSize(ticker) == 0:
+        if self.GetPositionSize(ticker) == 0:
             price = self.datas[ticker].loc[self.current_idx,'Adj Close']
             self.Buy(ticker, size = math.floor(self.portfolio.cash/price))
             if verbose:
@@ -134,7 +134,7 @@ class SMACross(Strategy):
         
         #If we do not own a position and the fast average crosses
         # upwards through the slow average, generate a buy signal
-        if self.positionSize(ticker) == 0:
+        if self.GetPositionSize(ticker) == 0:
             if self.crossover(ticker)>thresh: 
             
                 self.Buy(ticker, size = 1)
