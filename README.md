@@ -1,36 +1,157 @@
 # TradingSystem: A backtester for trading pairs strategies
 
-Provides basic functionality for backtesting algorithmic trading strategies.
-Currently, the following features are supported:
-* Adding financial data to the data feed (using yahooFinance)
-* Create new trading strategies
-* Backtest trading strategies against the historical data
-* Analyze and plot the results of the backtest
+This library provides a comprehensive framework for backtesting algorithmic trading strategies, specifically designed for pairs trading. Key features include:
+
+* Adding financial data to the data feed using yahooFinance
+* Creating new trading strategies
+* Backtesting trading strategies against historical data
+* Analyzing and plotting the results of the backtest
+
+Explore a list of basic trading strategies in the [Examples Notebook](TradingSystem/Examples.ipynb). These strategies are included to demonstrate the functionality of the trading system and are not intended to be profitable.
 
 
-A list of basic trading strategies can be found [here](TradingSystem/Examples.ipynb). These strategies are not meant to be profitable and are only included to demonstrate the functionality of the trading system.
+# Basic usage
+
+The Basic Trading System provides a framework for backtesting algorithmic trading strategies. Follow these steps to get started:
+
+1. **Create an Instance**:
+   ```python
+   from TradingSystem import *
+   trading_system = TradingSystem()
+   ```
+
+2. **Add financial data:**
+
+    Use the `TradingSystem.DownloadData(ticker, startDate, endDate)` method to add financial data to the data feed. Currently, data is sourced from `yahooFinance`.
+    ```python
+    trading_system.DownloadData("AAPL", "2020-01-01", "2021-01-01")
+    ```
+
+
+3. **Define a strategy:**
+
+    Create a new strategy by defining a class that inherits from `Strategy` and overrides the `OnBar()` method. This method is executed once per day during a backtest and is used to create buy and sell orders.
+    ```python
+    class MyStrategy(Strategy):
+    def OnBar(self):
+        # Define buy and sell logic here
+        pass
+    ```
+
+
+4.  **Set Initial Portfolio Cash:**
+
+    Specify the initial amount of money available in the portfolio using `TradingSystem.portfolio.SetInitialCash(cash)`.
+    ```python 
+    trading_system.portfolio.SetInitialCash(100000)
+    ```
+
+
+5. **Run the Backtest:**
+
+    Execute the backtest of the defined strategy with the provided data using `TradingSystem.Run()`.
+    ```python
+    trading_system.Run()
+    ```
+
+6. **Analyze the Backtest:**
+
+    Evaluate the backtest results using various statistics provided by `TradingSystem.GetStats()`. Additionally, `TradingSystem.log` tracks the portfolio's value over time and can be used for plotting.
+    ```python
+    stats = trading_system.GetStats()
+    ```
+
+## A toy exampple
+
+
+
+
+The following example demonstrates the usage of the Basic Trading System with a simple toy strategy: buying a stock one day and selling it the next day.
+```python
+class BuyAndSellStrategy(Strategy):
+    def OnBar(self, verbose = False):
+        # Uses the first ticker that was added to the data feed
+         ticker = self.tickers[0]
+
+        # Check if the asset is already owned
+        if self.GetPositionSize(ticker) == 0:
+            self.Buy(ticker, size = 1)
+            if verbose:
+                print(self.current_idx,"Buy order created")
+        else:
+            self.Sell(ticker, size = 1)
+            if verbose:
+                print(self.current_idx,"Sell order created")
+
+
+trading_system = TradingSystem()
+trading_system.DownloadData("AAPL", "2020-01-01", "2021-01-01")
+trading_system.portfolio.SetInitialCash(100000)
+trading_system.SetStrategy(BuyAndSellStrategy())
+trading_system.Run()
+
+stats = trading_system.GetStats()
+
+# Show the portfolio value over time
+trader.log.plot()
+plt.title("Portfolio value over time",size='x-large',color='blue')
+plt.show()
+```
+
+
+
+
+
+
+
 
 # Pairs trading
-A basic strategy in Statistical Arbitrage is to find a pair of two assets that are highly correlated. If, due to marked inefficiencies, one of the stocks is overvalued and the other is undervalued, we enter a short position in the overvalued stock and a long position in the undervalued stock. The assumption is that in the long run, both assets will return to their common mean, a process known as mean-reversion. To apply this strategy successfully one needs to first find suitable pairs whose time series shows a strong mean-reversion effect.
-In [this notebook ](TradingSystem/PairsSelection.ipynb) we implement the following approach to determine suitable pairs among a list of 87 financial assets.
-- Stochastic processes that are stationary and ergodic have the property that in the long run the time average returns to the mean (by Birkhoff's ergodic theorem). As a first step, we want to determine if two time series $X_t, Y_t$ are cointegrated, i.e. such that $Y_t -\alpha X_t$ is a stationary stochastic process. For this, we use the two-step Earle-Grenger test, which is based on the Augmented Dickey-Fuller test for stationarity of a time series.
-- As an initial step we  use clustering to sort the time series. We first apply principal component analysis to reduce the dimensions of the data and then use the OPTICS algorithm for clustering.
-- For each possible pair in a cluster we use the Earle-Grenger test for cointegration and only accept pairs with a resulting p-Value less than $0.03$.
-- Once we find a suitably cointegrated pair, the next step is to establish that the time series is mean-reverting. Here we use three technical indicators:
-- The Hurst exponent is a measure of the long-term memory of a time series. A value between 0-0.5 indicates that the time series will switch between very large and very small values and frequently cross the mean.
-- The half-life time measures how fast a time series reverts back to half its initial deviation from the mean. Assuming an AR(1) model for the spread we can estimate the half-life time as 
-$$-\dfrac{\ln(2)}{\ln(\beta)}$$
-where $\beta$ is obtained by linear regression of $Y_t$ against $Y_{t-1}$.
-- Lastly, we count the number of times the spread crosses its mean.
-For example, our analysis found that the time series for 'KEY'(KeyCorp) and 'FITB'(Fifth Third Bank) show strong mean-reversion between Jan 2021 and October 2023.
+Pairs trading is a fundamental strategy in statistical arbitrage, aimed at identifying pairs of highly correlated assets. By detecting pairs where one asset is overvalued and the other is undervalued, a trading strategy can be developed to profit from the mean-reversion of these assets.
+
+To successfully implement this strategy, suitable pairs must be identified. In [Pairs Selection Notebook](TradingSystem/PairsSelection.ipynb) we demonstrate the following approach to determine suitable pairs from a list of 87 financial assets:
+1. **Cointegration test:** 
+
+    Stationary and ergodic stochastic processes return to the mean in the long run  (by Birkhoff's ergodic theorem). As a first step, we want to determine if two time series $X_t, Y_t$ are cointegrated, such that $Y_t -\alpha X_t$, is stationary, we use the two-step Earle-Grenger test,  based on the Augmented Dickey-Fuller test for stationarity.
+2. **Clustering:**
+    - Initial sorting of time series is done using clustering. Principal Component Analysis (PCA) is applied to reduce data dimensions, followed by the OPTICS algorithm for clustering.
+    - For each pair in a cluster, the Engle-Granger test for cointegration is applied, accepting pairs with a p-value less than 0.03.
+    
+3. **Mean-Reversion Indicators:**
+    - **Hurst Exponent:** 
+    Measures long-term memory of a time series. Values between 0 and 0.5 indicate frequent crossings of the mean.
+    - **Half-life:**  Estimates how quickly a time series reverts to half its initial deviation from the mean, calculated as
+    $$
+    -\dfrac{\ln(2)}{\ln(\beta)}
+    $$,
+    where $\beta$ is obtained by linear regression of $Y_t$ against $Y_{t-1}$.
+    - **Mean-crossings:**  Counts the number of times the spread crosses its mean.
+
+For instance, our analysis identified strong mean-reversion between 'KEY' (KeyCorp) and 'FITB' (Fifth Third Bank) from January 2021 to October 2023.
 ![Unknown-2](https://github.com/FrederikBenirschke/BasicTradingSystem/assets/133478072/191ac842-819a-4552-9c4a-a99931ae9670)
 
 
-After we have selected promising pairs, [in this notebook](TradingSystem/TradingPairsExample.ipynb), we use the trading system to implement a pair trading strategy
-that generates buy and sell signals based on the z-score of the spread. We use a z-Score > 1 as an indicator that the first asset is overvalued and a z-Score < -1 as an indicator that the second asset is overvalued.
-Here is a plot of a simple strategy trading Binance and CitiGroup from 2021 to 2023.
+After selecting promising pairs, the  [Trading Pairs Example Notebook](TradingSystem/TradingPairsExample.ipynb), demonstrates a pairs trading strategy that generates buy and sell signals based on the z-score of the spread. A z-score > 1 indicates the first asset is overvalued, and a z-score < -1 indicates the second asset is overvalued.
+
+Below is a plot of a simple strategy trading Binance and Citigroup from 2021 to 2023.
 
 ![Unknown-4](https://github.com/FrederikBenirschke/BasicTradingSystem/assets/133478072/413490e9-dadc-4745-8255-da8387025cf5)
+
+
+## Installation
+
+Follow these steps to install the project on your local machine:
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/FrederikBenirschke/BasicTradingSystem.git
+
+2. Install dependencies:
+```bash
+pip install -r basic_trading_system_conda.yml
+```
+
+Note: If you are using a different package manager (such as `conda`), you may need to use the appropriate command to install the dependencies from the `basic_trading_system_conda.yml` file.
 
 
 
