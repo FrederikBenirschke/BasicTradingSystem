@@ -10,7 +10,16 @@ This library provides a comprehensive framework for backtesting algorithmic trad
 Explore a list of basic trading strategies in the [Examples Notebook](TradingSystem/Examples.ipynb). These strategies are included to demonstrate the functionality of the trading system and are not intended to be profitable.
 
 
-# Basic usage
+
+## Table of Contents
+
+- [Basic usage](#basic-usage)
+- [A toy example](#a-toy-example)
+- [Pairs trading](#pairs-trading)
+- [Installation](#installation)
+- [Prerequisites](#prerequisites)
+
+## Basic usage
 
 The Basic Trading System provides a framework for backtesting algorithmic trading strategies. Follow these steps to get started:
 
@@ -61,7 +70,7 @@ The Basic Trading System provides a framework for backtesting algorithmic tradin
     stats = trading_system.GetStats()
     ```
 
-## A toy exampple
+## A toy example
 
 
 
@@ -105,7 +114,7 @@ plt.show()
 
 
 
-# Pairs trading
+## Pairs trading
 Pairs trading is a fundamental strategy in statistical arbitrage, aimed at identifying pairs of highly correlated assets. By detecting pairs where one asset is overvalued and the other is undervalued, a trading strategy can be developed to profit from the mean-reversion of these assets.
 
 To successfully implement this strategy, suitable pairs must be identified. In [Pairs Selection Notebook](TradingSystem/PairsSelection.ipynb) we demonstrate the following approach to determine suitable pairs from a list of 87 financial assets:
@@ -157,9 +166,8 @@ Note: If you are using a different package manager (such as `conda`), you may ne
 
 
 
-# Prerequisites 
+## Prerequisites 
 The prerequisites are found in the [YML file](basic_trading_sytem.conda.yml).
-
 
 
 
