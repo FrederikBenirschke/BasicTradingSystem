@@ -136,9 +136,9 @@ After selecting promising pairs, the  [Trading Pairs Example Notebook](TradingSy
 
 Below is a plot of a simple strategy trading Binance and Citigroup from 2021 to 2023.
 
-![Unknown-4](https://github.com/FrederikBenirschke/BasicTradingSystem/assets/133478072/413490e9-dadc-4745-8255-da8387025cf5)
 
 
+![Unknown-4](Images/PairTrading.png)
 
 ## Installation
 
