@@ -120,8 +120,7 @@ To successfully implement this strategy, suitable pairs must be identified. In [
     - **Hurst Exponent:** 
     Measures long-term memory of a time series. Values between 0 and 0.5 indicate frequent crossings of the mean.
     - **Half-life:**  Estimates how quickly a time series reverts to half its initial deviation from the mean, calculated as
-    $$
-    -\dfrac{\ln(2)}{\ln(\beta)}
+    $$-\dfrac{\ln(2)}{\ln(\beta)}
     $$,
     where $\beta$ is obtained by linear regression of $Y_t$ against $Y_{t-1}$.
     - **Mean-crossings:**  Counts the number of times the spread crosses its mean.
