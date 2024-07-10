@@ -10,6 +10,10 @@ class Strategy:
 
 
     def __init__(self):
+        """
+        Initializes the Strategy object by setting instance variables such as 
+        current_idx, datas, orders, trades, portfolio, and tickers.
+        """
         self.current_idx = None
         self.datas = {}
         self.orders = []
@@ -67,6 +71,17 @@ class BasicStrategy(Strategy):
     '''Basic strategy for testing purposes only. Buys on one day and sells on the next.'''
 
     def OnBar(self, verbose = False):
+        """
+        Execute the trading logic for each bar:
+        - If the asset is not owned, buy it
+        - If the asset is owned, sell it
+
+        Parameters:
+        verbose (bool):  Whether to print details about all orders. Default is False.
+
+        Returns:
+        None
+        """
         ticker = self.tickers[0]
         
         if self.GetPositionSize(ticker) == 0:
@@ -83,6 +98,17 @@ class BuyAndHold(Strategy):
     ''' Buy maximum amount of an asset on day 1 and hold until the end.'''
 
     def OnBar(self, verbose = False):
+        """
+        Execute the trading logic for each bar:
+        - On day 1, buy maximum amount of an asset
+        - On all other days, do nothing
+
+        Parameters:
+        verbose (bool): Whether to print details about all orders. Default is False.
+
+        Returns:
+        None
+        """
         ticker = self.tickers[0]
         
         if self.GetPositionSize(ticker) == 0:
@@ -104,7 +130,16 @@ class SMACross(Strategy):
 
 
     def crossover(self, ticker):
-        ''' Computes the difference between the slopes of the secant lines of the fast and slow moving averages.'''
+        """
+        Computes the difference between the slopes of the secant lines of the fast and slow moving averages.
+
+        Parameters:
+            ticker (str): The ticker symbol of the asset.
+
+        Returns:
+            float: The difference between the slopes of the secant lines of the fast and slow moving averages.
+        """
+       
         
         df = pd.DataFrame(index = self.datas[ticker].index)
         df['Adj Close'] = self.datas[ticker]['Adj Close']
