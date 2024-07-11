@@ -236,7 +236,7 @@ class TradingSystem:
 
 		metrics = {}
 		helperMetrics = {}
-		# Total return consisits of current value of the portfolio which is the sum of the cash value and the value of the current
+		# Total return consists of current value of the portfolio which is the sum of the cash value and the value of the current
 		# assets
 		totalReturn = self.portfolio.cash
 		for ticker in self.datas:
@@ -252,7 +252,6 @@ class TradingSystem:
 		std_daily_return = daily_returns.std()
 
 
-		# Volatility 
 		
 
 		# Annualize the volatility
