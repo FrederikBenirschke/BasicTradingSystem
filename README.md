@@ -142,7 +142,7 @@ For instance, our analysis identified strong mean-reversion between 'KEY' (KeyCo
 
 After selecting promising pairs, the  [Trading Pairs Example Notebook](TradingSystem/TradingPairsExample.ipynb), demonstrates a pairs trading strategy that generates buy and sell signals based on the z-score of the spread. A z-score > 1 indicates the first asset is overvalued, and a z-score < -1 indicates the second asset is overvalued.
 
-Below is a plot of a simple strategy trading Binance and Citigroup from 2021 to 2023.\
+Below is a plot of a simple strategy trading Binance and Citigroup from 2021 to 2023.
 
 
 
