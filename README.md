@@ -7,7 +7,7 @@ This library provides a comprehensive framework for backtesting algorithmic trad
 * Backtesting trading strategies against historical data
 * Analyzing and plotting the results of the backtest
 
-Explore a list of basic trading strategies in the [Examples Notebook](Examples.ipynb). These strategies are included to demonstrate the functionality of the trading system and are not intended to be profitable.
+Explore a list of basic trading strategies in the [Examples Notebook](Examples/Examples.ipynb). These strategies are included to demonstrate the functionality of the trading system and are not intended to be profitable.
 
 
 
@@ -117,10 +117,10 @@ plt.show()
 ## Pairs trading
 Pairs trading is a fundamental strategy in statistical arbitrage, aimed at identifying pairs of highly correlated assets. By detecting pairs where one asset is overvalued and the other is undervalued, a trading strategy can be developed to profit from the mean-reversion of these assets.
 
-To successfully implement this strategy, suitable pairs must be identified. In [Pairs Selection Notebook](TradingSystem/PairsSelection.ipynb) we demonstrate the following approach to determine suitable pairs from a list of 87 financial assets:
+To successfully implement this strategy, suitable pairs must be identified. In [Pairs Selection Notebook](Examples/PairsSelection.ipynb) we demonstrate the following approach to determine suitable pairs from a list of 87 financial assets:
 1. **Cointegration test:** 
 
-    Stationary and ergodic stochastic processes return to the mean in the long run  (by Birkhoff's ergodic theorem). As a first step, we want to determine if two time series $X_t, Y_t$ are cointegrated, such that $Y_t -\alpha X_t$, is stationary, we use the two-step Earle-Grenger test,  based on the Augmented Dickey-Fuller test for stationarity.
+    Stationary and ergodic stochastic processes return to the mean in the long run  (by Birkhoff's ergodic theorem). As a first step, we want to determine if two time series $X_t, Y_t$ are cointegrated, such that $Y_t -\alpha X_t$, is stationary, we use the two-step Engle-Grenger test,  based on the Augmented Dickey-Fuller test for stationarity.
 2. **Clustering:**
     - Initial sorting of time series is done using clustering. Principal Component Analysis (PCA) is applied to reduce data dimensions, followed by the OPTICS algorithm for clustering.
     - For each pair in a cluster, the Engle-Granger test for cointegration is applied, accepting pairs with a p-value less than 0.03.
