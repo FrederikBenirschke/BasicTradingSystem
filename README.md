@@ -7,7 +7,7 @@ This library provides a comprehensive framework for backtesting algorithmic trad
 * Backtesting trading strategies against historical data
 * Analyzing and plotting the results of the backtest
 
-Explore a list of basic trading strategies in the [Examples Notebook](TradingSystem/Examples.ipynb). These strategies are included to demonstrate the functionality of the trading system and are not intended to be profitable.
+Explore a list of basic trading strategies in the [Examples Notebook](Examples.ipynb). These strategies are included to demonstrate the functionality of the trading system and are not intended to be profitable.
 
 
 
